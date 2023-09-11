@@ -2,13 +2,29 @@ import 'package:clima_app/utilities/const.dart';
 import 'package:flutter/material.dart';
 
 class LocationScreen extends StatefulWidget {
-  const LocationScreen({super.key});
+  const LocationScreen({super.key, this.pokemonInfo});
+
+  final pokemonInfo;
 
   @override
   State<LocationScreen> createState() => _LocationScreenState();
 }
 
 class _LocationScreenState extends State<LocationScreen> {
+
+  String pokeAbility = "";
+
+  @override
+  void initState() {
+    updateUI(widget.pokemonInfo);
+  }
+
+  void updateUI(dynamic pokemon){
+    //double temperature = weatherData['main']['temp'];
+    pokeAbility = pokemon['abilities'][0]['ability']["name"];
+    print(pokeAbility);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,24 +49,32 @@ class _LocationScreenState extends State<LocationScreen> {
                 children: [
                   TextButton(
                       onPressed: (){},
-                      child: const Icon(Icons.location_city,
+                      child: const Icon(Icons.place,
                       size: 50.0,
+                      color: Colors.white,
                       ),
+                  ),
+                  TextButton(
+                    onPressed: (){},
+                    child: const Icon(Icons.location_city,
+                      size: 50.0,
+                      color: Colors.white,
+                    ),
                   ),
                 ],
               ),
               const Padding(padding: EdgeInsets.only(left: 15.0),
               child: Row(
                 children: [
-                  Text("32", style: kTempTextStyle),
+                  Text("32°", style: kTempTextStyle),
                   Text("☀️", style: kConditionTextStyle),
                 ],
               ),
               ),
-              const Padding(
-                padding: EdgeInsets.only(right: 15.0),
+              Padding(
+                padding: const EdgeInsets.only(right: 15.0),
                 child: Text(
-                    "Ta helao en la palma",
+                    pokeAbility,
                     textAlign: TextAlign.right,
                     style: kMessageTextStyle,
                 ),

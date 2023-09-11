@@ -1,42 +1,44 @@
+import 'package:clima_app/screens/location_sreen.dart';
+import 'package:clima_app/services/api.dart';
 import 'package:clima_app/services/location.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+
+const apiKey = "2a65c5814b36618b3a5951cef5d8072c";
 
 class LoadingScreen extends StatefulWidget {
   const LoadingScreen({super.key});
-
   @override
   State<LoadingScreen> createState() => _LoadingScreenState();
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
 
+  double latitude = 0;
+  double longitud = 0;
+
   //metodo para obtener posicion
-  void getLocation() async {
+  void getLocationData() async {
     //inicializamos la clase
     Location location = Location();
     await location.getLocation();
-    print(location.latitude);
-    print(location.longitud);
-  }
+    latitude = location.latitude;
+    longitud = location.longitud;
 
-  void getData() async {
-    var url = "https://api.openweathermap.org/data/3.0/onecall?lat=$lat&lon=$lon&exclude=$part&appid=$apiKey";
+    //instancia hacia metodo api
+    //ApiHelper apiHelper = ApiHelper("https://api.openweathermap.org/data/2.5/onecall?lat=$latitude&lon=$longitud&appid=$apiKey");
+    ApiHelper apiHelper = ApiHelper("https://pokeapi.co/api/v2/pokemon/gengar");
+    //Se hace el llamado a la API
+    try {
+      //Se manda a traer la info y se almacena
+      var weatherData = await apiHelper.getData();
+      //Si se comprela se manda a llamar la nueva pantalla
+      Navigator.push(context, MaterialPageRoute(builder: (context){
+        return LocationScreen(pokemonInfo: weatherData,);
+      }));
 
-    http.Response response = await http.get(Uri.parse(url));
-
-    if(response.statusCode == 200){
-      String data = response.body;
-
-      var decodedData = jsonDecode(data);
-
-      double temperature = decodedData['main']['temp'];
-      int conditionNumber = decodedData['weather'][0]['id'];
-      String cityName = decodedData['name'];
-
-    }else{
-      print(response.statusCode);
+    } catch (error) {
+      print('Error al hacer fetch a la data: $error');
     }
   }
 
@@ -44,13 +46,18 @@ class _LoadingScreenState extends State<LoadingScreen> {
   @override
   void initState() {
     super.initState();
-    getLocation();
+    getLocationData();
   }
 
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      body: Center(),
+      body: Center(
+        child: SpinKitPulsingGrid(
+          color: Colors.white,
+          size: 150,
+        ),
+      ),
     );
   }
 }
